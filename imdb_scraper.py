@@ -36,10 +36,19 @@ movie_div = soup.find_all('div', class_='lister-item mode-advanced')
 
 # loop through each container
 for container in movie_div:
-    # film name
+    # name
     name = container.h3.a.text
     titles.append(name)
 
-    # film year
+    # year
     year = container.h3.find('span', class_='lister-item-year').text
     years.append(year)
+
+    # time
+    runtime = container.p.find('span', class_='runtime').text if container.p.find(
+        'span', class_='runtime').text else '-'
+    time.append(runtime)
+
+    # rating
+    rating = float(container.strong.text)
+    imdb_ratings.append(rating)
