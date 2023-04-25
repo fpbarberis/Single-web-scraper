@@ -30,6 +30,7 @@ imdb_ratings = []
 metascores = []
 votes = []
 us_gross = []
+resume = []
 
 # movies are in the lister-item mode-advanced div
 movie_div = soup.find_all('div', class_='lister-item mode-advanced')
@@ -52,3 +53,24 @@ for container in movie_div:
     # rating
     rating = float(container.strong.text)
     imdb_ratings.append(rating)
+
+    # metascore
+    metascore = container.find('span', class_='metascore').text if container.find(
+        'span', class_='metascore').text else '-'
+    # remove spaces after number
+    metascore = metascore.strip()
+    metascores.append(metascore)
+
+    # votes
+    nv = container.find_all('span', attrs={'name': 'nv'})
+    vote = nv[0].text
+    votes.append(vote)
+
+    # grosses
+    grosses = nv[1].text if len(nv) > 1 else '-'
+    us_gross.append(grosses)
+
+    # resume
+    p_tags = container.find_all('p', class_='text-muted')
+    text = p_tags[1].text if len(p_tags) >= 2 else '-'
+    resume.append(text)
