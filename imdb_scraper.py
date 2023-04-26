@@ -4,6 +4,12 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 import chardet
+from time import sleep
+from random import randint
+from datetime import datetime as dt
+
+start = dt.now()
+print(f"\n--- starting scraping ---")
 
 # web to scrap
 url = "https://www.imdb.com/search/title/?groups=top_1000&ref_=adv_prv"
@@ -33,44 +39,61 @@ us_gross = []
 resume = []
 
 # movies are in the lister-item mode-advanced div
-movie_div = soup.find_all('div', class_='lister-item mode-advanced')
+# movie_div = soup.find_all('div', class_='lister-item mode-advanced')
 
-# loop through each container
-for container in movie_div:
-    # name
-    name = container.h3.a.text
-    titles.append(name)
+pages = np.arange(1, 1001, 50)
 
-    # year
-    year = container.h3.find('span', class_='lister-item-year').text
-    years.append(year)
+for page in pages:
 
-    # time
-    runtime = container.p.find('span', class_='runtime').text if container.p.find(
-        'span', class_='runtime').text else '-'
-    time.append(runtime)
+    page = requests.get("https://www.imdb.com/search/title/?groups=top_1000&start=" +
+                        str(page) + "&ref_=adv_nxt", headers=headers)
 
-    # rating
-    rating = float(container.strong.text)
-    imdb_ratings.append(rating)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    # movies are in the lister-item mode-advanced div
+    movie_div = soup.find_all('div', class_='lister-item mode-advanced')
 
-    # metascore
-    metascore = container.find('span', class_='metascore').text if container.find(
-        'span', class_='metascore').text else '-'
-    # remove spaces after number
-    metascore = metascore.strip()
-    metascores.append(metascore)
+    sleep(randint(2, 10))
 
-    # votes
-    nv = container.find_all('span', attrs={'name': 'nv'})
-    vote = nv[0].text
-    votes.append(vote)
+    # loop through each container
+    for container in movie_div:
+        # name
+        name = container.h3.a.text
+        titles.append(name)
 
-    # grosses
-    grosses = nv[1].text if len(nv) > 1 else '-'
-    us_gross.append(grosses)
+        # year
+        year = container.h3.find('span', class_='lister-item-year').text
+        years.append(year)
 
-    # resume
-    p_tags = container.find_all('p', class_='text-muted')
-    text = p_tags[1].text if len(p_tags) >= 2 else '-'
-    resume.append(text)
+        # time
+        runtime = container.p.find('span', class_='runtime').text if container.p.find(
+            'span', class_='runtime') else '-'
+        time.append(runtime)
+
+        # rating
+        rating = float(container.strong.text)
+        imdb_ratings.append(rating)
+
+        # metascore
+        metascore = container.find('span', class_='metascore').text if container.find(
+            'span', class_='metascore') else '-'
+        # remove spaces after number
+        metascore = metascore.strip()
+        metascores.append(metascore)
+
+        # votes
+        nv = container.find_all('span', attrs={'name': 'nv'})
+        vote = nv[0].text
+        votes.append(vote)
+
+        # grosses
+        grosses = nv[1].text if len(nv) > 1 else '-'
+        us_gross.append(grosses)
+
+        # resume
+        p_tags = container.find_all('p', class_='text-muted')
+        text = p_tags[1].text if len(p_tags) >= 2 else '-'
+        resume.append(text)
+
+end = dt.now()
+print(
+    f"\n--- Scraping terminado con éxito en: {str(end-start).split('.')[0]} ---")
