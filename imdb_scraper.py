@@ -106,8 +106,20 @@ movies = pd.DataFrame({
     'resume': resume,
 })
 
-print(movies)
+# Some modifications -  Data cleaning
+movies['votes'] = movies['votes'].str.replace(',', '').astype(int)
+movies['year'] = movies['year'].str.extract('(\d+)').astype(int)
 
+# strip the $ from the left side and strip the M from the right side
+movies['us_grossMillions'] = movies['us_grossMillions'].map(
+    lambda x: x.lstrip('$').rstrip('M'))
+movies['us_grossMillions'] = pd.to_numeric(
+    movies['us_grossMillions'], errors='coerce')
+movies['resume'] = movies['resume'].str.replace('\n', '')
+
+print(movies)
+print(movies['resume'])
+# movies.to_csv('resultado_scraper.csv')
 
 end = dt.now()
 print(
