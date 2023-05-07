@@ -94,6 +94,21 @@ for page in pages:
         text = p_tags[1].text if len(p_tags) >= 2 else '-'
         resume.append(text)
 
+# Building the DataFrame
+movies = pd.DataFrame({
+    'movie': titles,
+    'year': years,
+    'timeMin': time,
+    'imdb': imdb_ratings,
+    'metascore': metascores,
+    'votes': votes,
+    'us_grossMillions': us_gross,
+    'resume': resume,
+})
+
+print(movies)
+
+
 end = dt.now()
 print(
     f"\n--- Scraping terminado con éxito en: {str(end-start).split('.')[0]} ---")
